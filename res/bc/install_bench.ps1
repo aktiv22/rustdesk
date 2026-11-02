@@ -5,7 +5,7 @@
 #>
 param(
     [Parameter(Mandatory)][string]$Installer,
-    [Parameter(Mandatory)][string]$Config,
+    [string]$Config = "",   # optional: un profil semnat custom.txt (pe bancuri NU se foloseste; setarile blocate sunt implicite in program)
     [Parameter(Mandatory)][string]$Password,
     [string]$AllowedIps = "",   # adresele locale ale PC-urilor Master/recepție, separate prin virgulă (opțional, dar recomandat)
     [string]$InstallDir = "$env:ProgramFiles\BancControl",
@@ -19,7 +19,7 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
         [Security.Principal.WindowsBuiltInRole]::Administrator)) { Fail "Rulează scriptul ca Administrator." }
 if ([string]::IsNullOrWhiteSpace($Password) -or $Password.Length -lt 8) { Fail "Parola e goală sau prea scurtă (minim 8 caractere)." }
 if (-not (Test-Path $Installer)) { Fail "Nu găsesc installerul: $Installer" }
-if (-not (Test-Path $Config)) { Fail "Nu găsesc custom.txt: $Config" }
+if ($Config -and -not (Test-Path $Config)) { Fail "Nu găsesc custom.txt: $Config" }
 
 # Citare corectă pentru linia de comandă Windows (parole cu ", ', $, spații, \)
 function ConvertTo-WinArg([string]$a) {
@@ -46,7 +46,7 @@ $exe = Get-ChildItem $InstallDir -Filter '*.exe' -ErrorAction SilentlyContinue |
 if (-not $exe) { Fail "Nu găsesc programul instalat în $InstallDir." }
 
 # 2) profilul semnat lângă executabil; operatorii obișnuiți doar citesc
-Copy-Item $Config (Join-Path $InstallDir 'custom.txt') -Force
+if ($Config) { Copy-Item $Config (Join-Path $InstallDir 'custom.txt') -Force }
 & icacls $InstallDir /inheritance:r /grant:r 'SYSTEM:(OI)(CI)F' 'Administrators:(OI)(CI)F' 'Users:(OI)(CI)RX' | Out-Null
 
 # 3) serviciu cu pornire automată, repornit ca să citească profilul
@@ -62,6 +62,10 @@ if ($AllowedIps) {
     $r = Run $exe.FullName @('--option', 'whitelist', $AllowedIps)
     if ($r.Code -ne 0) { Fail "Nu am putut seta lista de adrese permise: $($r.Out.Trim())" }
 }
+
+# 3c) acces direct pe IP în rețeaua locală (nu merge din profilul semnat de banc, vezi nota din stare)
+$r = Run $exe.FullName @('--option', 'direct-server', 'Y')
+if ($r.Code -ne 0) { Fail "Nu am putut activa accesul direct pe IP: $($r.Out.Trim())" }
 
 # 4) parola permanentă (după repornire, fără a fi afișată)
 $r = Run $exe.FullName @('--password', $Password)
