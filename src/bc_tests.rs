@@ -43,6 +43,11 @@ fn assert_locked() {
     }
     assert!(is_disable_settings());
     assert!(is_incoming_only());
+    // administratorul poate încă seta parola din linia de comandă (instalare)
+    assert_eq!(
+        get_builtin_option("allow-command-line-settings-when-settings-disabled"),
+        "Y"
+    );
 }
 
 #[test]

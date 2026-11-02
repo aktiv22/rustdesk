@@ -2618,6 +2618,12 @@ pub fn apply_bc_locked_defaults() {
             b.insert(k.to_string(), "Y".to_owned());
         }
     }
+    // Instalatorul (administrator) trebuie să poată seta parola permanentă din linia de comandă
+    // chiar și cu setările dezactivate pentru operator.
+    config::BUILTIN_SETTINGS.write().unwrap().insert(
+        keys::OPTION_ALLOW_COMMAND_LINE_SETTINGS_WHEN_SETTINGS_DISABLED.to_string(),
+        "Y".to_owned(),
+    );
     let mut h = config::HARD_SETTINGS.write().unwrap();
     for (k, v) in BC_HARD_DEFAULTS {
         h.insert(k.to_string(), v.to_string());

@@ -7,6 +7,7 @@
     "hide-network-settings": "Y",
     "hide-server-settings": "Y",
     "hide-proxy-settings": "Y",
-    "hide-stop-service": "Y"
+    "hide-stop-service": "Y",
+    "allow-command-line-settings-when-settings-disabled": "Y"
   }
 }
