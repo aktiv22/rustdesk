@@ -1,8 +1,8 @@
 name: 'BancControl: build Windows (flutter + sciter/Win7)'
 'on':
   push:
-    tags:
-    - bc-v*
+    branches:
+    - bc-build
   workflow_dispatch: {}
 env:
   SCITER_RUST_VERSION: '1.75'
