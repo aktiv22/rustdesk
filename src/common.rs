@@ -2594,7 +2594,7 @@ pub fn get_dst_align_rgba() -> usize {
 // BancControl: cheia publică cu care se verifică `custom.txt`. Valoarea de mai jos (32 de octeți zero)
 // este un substitut care nu verifică nicio semnătură: până la înlocuirea ei cu cheia proprie
 // (generată cu `res/bc/sign_config.py --gen-keys`), niciun `custom.txt` nu este acceptat.
-pub const BC_CONFIG_PUBKEY: &str = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+pub const BC_CONFIG_PUBKEY: &str = "Nc3Eiw54lgz0OGr7cIHzF6tc0OqWlI9JLHTo4nGuKTo=";
 
 // BancControl: starea implicită, înainte de orice `custom.txt`, este BLOCATĂ pentru operator.
 // Un profil semnat (master/recepție) poate suprascrie aceste valori cu "N".
