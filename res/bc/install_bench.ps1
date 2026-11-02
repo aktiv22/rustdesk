@@ -7,6 +7,7 @@ param(
     [Parameter(Mandatory)][string]$Installer,
     [Parameter(Mandatory)][string]$Config,
     [Parameter(Mandatory)][string]$Password,
+    [string]$AllowedIps = "",   # adresele locale ale PC-urilor Master/recepție, separate prin virgulă (opțional, dar recomandat)
     [string]$InstallDir = "$env:ProgramFiles\BancControl",
     [string]$ServiceName = "BancControl"
 )
@@ -53,6 +54,14 @@ $svc = Get-Service | Where-Object { $_.Name -like "$ServiceName*" } | Select-Obj
 if (-not $svc) { Fail "Nu găsesc serviciul $ServiceName." }
 Set-Service -Name $svc.Name -StartupType Automatic
 Restart-Service -Name $svc.Name
+
+# 3b) rețea locală: acces direct pe IP (port 21118), doar din subrețeaua locală (netsh merge și pe Windows 7)
+& netsh advfirewall firewall delete rule name="BancControl direct" | Out-Null
+& netsh advfirewall firewall add rule name="BancControl direct" dir=in action=allow protocol=TCP localport=21118 remoteip=LocalSubnet | Out-Null
+if ($AllowedIps) {
+    $r = Run $exe.FullName @('--option', 'whitelist', $AllowedIps)
+    if ($r.Code -ne 0) { Fail "Nu am putut seta lista de adrese permise: $($r.Out.Trim())" }
+}
 
 # 4) parola permanentă (după repornire, fără a fi afișată)
 $r = Run $exe.FullName @('--password', $Password)

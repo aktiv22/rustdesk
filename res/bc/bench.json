@@ -8,6 +8,9 @@
     "hide-server-settings": "Y",
     "hide-proxy-settings": "Y",
     "hide-stop-service": "Y",
-    "allow-command-line-settings-when-settings-disabled": "Y"
+    "allow-command-line-settings-when-settings-disabled": "Y",
+    "direct-server": "Y",
+    "direct-access-port": "21118",
+    "enable-lan-discovery": "Y"
   }
 }
