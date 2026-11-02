@@ -1,0 +1,12 @@
+{
+  "conn-type": "both",
+  "disable-settings": "N",
+  "override-settings": {
+    "hide-general-settings": "N",
+    "hide-security-settings": "N",
+    "hide-network-settings": "N",
+    "hide-server-settings": "N",
+    "hide-proxy-settings": "N",
+    "hide-stop-service": "N"
+  }
+}

@@ -2493,6 +2493,7 @@ pub fn rustdesk_interval(i: Interval) -> ThrottledInterval {
 }
 
 pub fn load_custom_client() {
+    apply_bc_locked_defaults();
     #[cfg(debug_assertions)]
     if let Ok(data) = std::fs::read_to_string("./custom.txt") {
         read_custom_client(data.trim());
@@ -2590,13 +2591,49 @@ pub fn get_dst_align_rgba() -> usize {
     1
 }
 
+// BancControl: cheia publică cu care se verifică `custom.txt`. Valoarea de mai jos (32 de octeți zero)
+// este un substitut care nu verifică nicio semnătură: până la înlocuirea ei cu cheia proprie
+// (generată cu `res/bc/sign_config.py --gen-keys`), niciun `custom.txt` nu este acceptat.
+pub const BC_CONFIG_PUBKEY: &str = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+
+// BancControl: starea implicită, înainte de orice `custom.txt`, este BLOCATĂ pentru operator.
+// Un profil semnat (master/recepție) poate suprascrie aceste valori cu "N".
+pub const BC_LOCKED_DEFAULTS: &[&str] = &[
+    keys::OPTION_HIDE_GENERAL_SETTINGS,
+    keys::OPTION_HIDE_SECURITY_SETTINGS,
+    keys::OPTION_HIDE_NETWORK_SETTINGS,
+    keys::OPTION_HIDE_SERVER_SETTINGS,
+    keys::OPTION_HIDE_PROXY_SETTINGS,
+    keys::OPTION_HIDE_STOP_SERVICE,
+];
+
+// Setări "hard" implicite: fără setări pentru operator și doar primire de conexiuni (rol Slave).
+// Profilele master/recepție le suprascriu cu "disable-settings":"N" și "conn-type":"outgoing"/"both".
+pub const BC_HARD_DEFAULTS: &[(&str, &str)] = &[("disable-settings", "Y"), ("conn-type", "incoming")];
+
+pub fn apply_bc_locked_defaults() {
+    {
+        let mut b = config::BUILTIN_SETTINGS.write().unwrap();
+        for k in BC_LOCKED_DEFAULTS {
+            b.insert(k.to_string(), "Y".to_owned());
+        }
+    }
+    let mut h = config::HARD_SETTINGS.write().unwrap();
+    for (k, v) in BC_HARD_DEFAULTS {
+        h.insert(k.to_string(), v.to_string());
+    }
+}
+
 pub fn read_custom_client(config: &str) {
+    read_custom_client_with_key(config, BC_CONFIG_PUBKEY)
+}
+
+pub fn read_custom_client_with_key(config: &str, key: &str) {
     let Ok(data) = decode64(config) else {
         log::error!("Failed to decode custom client config");
         return;
     };
-    const KEY: &str = "5Qbwsde3unUcJBtrx9ZkvUmwFNoExHzpryHuPUdqlWM=";
-    let Some(pk) = get_rs_pk(KEY) else {
+    let Some(pk) = get_rs_pk(key) else {
         log::error!("Failed to parse public key of custom client");
         return;
     };
