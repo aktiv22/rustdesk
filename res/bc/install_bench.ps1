@@ -1,6 +1,6 @@
 <#
  BancControl: instalare pe un banc (rulează ca Administrator).
- Exemplu:  .\install_bench.ps1 -Installer .\BancControl-setup.exe -Config .\custom.txt -Password 'parola-lunga-aici'
+ Exemplu:  .\install_bench.ps1 -Installer .\rustdesk.exe (din folderul programului; se instaleaza ca BancControl.exe) -Config .\custom.txt -Password 'parola-lunga-aici'
  -Role este doar informativ: rolul vine din profilul semnat din custom.txt (bench / master / reception).
 #>
 param(

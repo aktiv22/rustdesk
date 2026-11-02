@@ -12,5 +12,8 @@
     "direct-server": "Y",
     "direct-access-port": "21118",
     "enable-lan-discovery": "Y"
+  },
+  "default-settings": {
+    "lang": "ro"
   }
 }

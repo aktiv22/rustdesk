@@ -8,5 +8,8 @@
     "hide-server-settings": "N",
     "hide-proxy-settings": "N",
     "hide-stop-service": "N"
+  },
+  "default-settings": {
+    "lang": "ro"
   }
 }
