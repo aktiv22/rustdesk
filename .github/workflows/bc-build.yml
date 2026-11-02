@@ -327,6 +327,7 @@ jobs:
         path: ./SignOutput/rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.msi
         if-no-files-found: error
   build-for-windows-sciter:
+    if: github.event_name == 'workflow_dispatch'
     name: ${{ matrix.job.target }} (${{ matrix.job.os }})
     needs:
     - validate-update-metadata-keys
